@@ -4,8 +4,6 @@ import "./globals.css";
 import Providers from "@/components/providers";
 import { connection } from 'next/server';
 
-export const runtime = 'edge';
-
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
