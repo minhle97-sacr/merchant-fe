@@ -2,6 +2,11 @@
   "name": "merchant-fe",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "yarn@1.22.22",
+  "engines": {
+    "node": ">=20.10.0",
+    "yarn": "1.22.22"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
