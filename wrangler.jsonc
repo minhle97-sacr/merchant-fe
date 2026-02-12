@@ -15,7 +15,7 @@
     {
       "binding": "WORKER_SELF_REFERENCE",
       "service": "my-app"
-    },
+    }
   ],
   "r2_buckets": [],
   "images": {
