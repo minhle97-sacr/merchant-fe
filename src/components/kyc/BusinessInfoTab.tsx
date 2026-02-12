@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { DocPreview } from './DocPreview';
-import { Select } from '../Select';
-import { Input } from '../Input';
-import { DatePicker } from '../DatePicker';
+import { DocPreview } from '@/components/kyc/DocPreview';
+import { Select } from '@/components/Select';
+import { Input } from '@/components/Input';
+import { DatePicker } from '@/components/DatePicker';
 import { Icon } from '@/components/Icon';
 import { ALLOWED_GOOGLE_BUSINESS_TYPES } from '@/utils/constants';
 import { toast } from 'sonner';

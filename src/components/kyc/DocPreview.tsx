@@ -1,8 +1,17 @@
+'use client';
+
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { Icon } from '@/components/Icon';
 import { useGetFileUrlMutation } from '@/services/api';
 import * as Dialog from '@radix-ui/react-dialog';
-import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer';
+import { Document, Page, pdfjs } from 'react-pdf';
+
+// Set up the worker for react-pdf
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 interface DocPreviewProps {
   field?: string;
@@ -119,21 +128,35 @@ export function DocPreview({ field, kycData, handleFileUpload, uploadingField, k
                 </button>
               </Dialog.Close>
             </div>
-            <div className="flex-1 overflow-auto bg-gray-100 flex items-center justify-center p-4">
-              {previewUrl && (
-                <DocViewer
-                prefetchMethod='GET'
-                  documents={[{ uri: previewUrl }]}
-                  pluginRenderers={DocViewerRenderers}
-                  style={{ width: '100%', height: '100%' }}
-                  config={{
-                    header: {
-                      disableHeader: true,
-                      disableFileName: true,
-                    }
-                  }}
-                />
-              )}
+            <div className="flex-1 overflow-auto bg-gray-100 flex flex-col items-center p-4">
+              {previewUrl && (() => {
+                const isPdf = typeof value === 'string' && value.toLowerCase().endsWith('.pdf');
+                
+                if (isPdf) {
+                  return (
+                    <Document
+                      file={previewUrl}
+                      loading={<div className="flex items-center gap-2"><div className="animate-spin"><Icon name="loader" size={24} /></div> Loading PDF...</div>}
+                      error={<div className="text-red-500">Failed to load PDF.</div>}
+                      className="max-w-full"
+                    >
+                      <Page pageNumber={1} renderTextLayer={false} renderAnnotationLayer={false} className="shadow-lg" width={Math.min(window.innerWidth * 0.9, 800)} />
+                    </Document>
+                  );
+                }
+                
+                return (
+                  <div className="relative w-full h-full min-h-[500px]">
+                    <Image 
+                      src={previewUrl} 
+                      alt="Document Preview" 
+                      fill
+                      className="object-contain shadow-lg rounded-lg"
+                      unoptimized
+                    />
+                  </div>
+                );
+              })()}
             </div>
           </Dialog.Content>
         </Dialog.Portal>
