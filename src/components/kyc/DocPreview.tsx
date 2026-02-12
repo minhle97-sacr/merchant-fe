@@ -1,17 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Icon } from '@/components/Icon';
 import { useGetFileUrlMutation } from '@/services/api';
 import * as Dialog from '@radix-ui/react-dialog';
-import { Document, Page, pdfjs } from 'react-pdf';
 
-// Set up the worker for react-pdf
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// Dynamic import for react-pdf to prevent SSR issues
+import dynamic from 'next/dynamic';
 
-import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
-import 'react-pdf/dist/esm/Page/TextLayer.css';
+const PDFViewer = dynamic(
+  () => import('./PDFViewer'),
+  { ssr: false, loading: () => <div className="animate-spin"><Icon name="loader" size={24} /></div> }
+);
 
 interface DocPreviewProps {
   field?: string;
@@ -134,14 +135,7 @@ export function DocPreview({ field, kycData, handleFileUpload, uploadingField, k
                 
                 if (isPdf) {
                   return (
-                    <Document
-                      file={previewUrl}
-                      loading={<div className="flex items-center gap-2"><div className="animate-spin"><Icon name="loader" size={24} /></div> Loading PDF...</div>}
-                      error={<div className="text-red-500">Failed to load PDF.</div>}
-                      className="max-w-full"
-                    >
-                      <Page pageNumber={1} renderTextLayer={false} renderAnnotationLayer={false} className="shadow-lg" width={Math.min(window.innerWidth * 0.9, 800)} />
-                    </Document>
+                    <PDFViewer file={previewUrl} />
                   );
                 }
                 
