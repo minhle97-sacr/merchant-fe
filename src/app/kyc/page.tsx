@@ -29,7 +29,7 @@ import {
 import { useJsApiLoader, Libraries } from '@react-google-maps/api';
 import Logo from '@/components/Logo';
 
-const LIBRARIES: Libraries = ['places'];
+export const LIBRARIES: Libraries = ['places'];
 
 export default function KYCScreen() {
     return (
@@ -58,8 +58,7 @@ function KYCContent() {
     const [kycStep, setKycStep] = useState(1);
     const [tempFiles, setTempFiles] = useState<Record<string, File>>({});
     const [errors, setErrors] = useState<Record<string, string>>({});
-    const [forceSearchName, setForceSearchName] = useState<string | undefined>("98");
-
+    const [forceSearchName, setForceSearchName] = useState<string | undefined>(undefined);
 
     const { data: businessProfile, isLoading: isProfileLoading } = useGetBusinessProfileQuery();
     const { data: outlets } = useGetOutletsQuery();
@@ -839,6 +838,11 @@ function KYCContent() {
         });
     };
 
+
+    if (!kycData) {
+        return null;
+    }
+
     if (kycStep === TABS.length + 1) {
         return (
             <div className="min-h-screen bg-white flex flex-col">
@@ -882,10 +886,6 @@ function KYCContent() {
                 </main>
             </div>
         );
-    }
-
-    if (!kycData) {
-        return null
     }
 
     return (

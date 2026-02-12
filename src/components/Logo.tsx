@@ -14,6 +14,7 @@ const Logo: React.FC<LogoProps> = ({ className, width = 120, height = 32 }) => {
         src="/icons/logo.png"
         alt="Redtab Logo"
         fill
+        sizes='120'
         className="object-contain"
         priority
       />

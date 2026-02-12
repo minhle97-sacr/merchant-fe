@@ -78,32 +78,33 @@ export const BusinessInfoTab = ({
     if (!isLoaded || !window.google) return;
 
     try {
-      const { AutocompleteSessionToken, AutocompleteService } = await window.google.maps.importLibrary("places") as any;
+      if (!sessionToken.current && window.google) {
+        const { AutocompleteSessionToken } = await window.google.maps.importLibrary("places") as any;
+        sessionToken.current = new AutocompleteSessionToken();
+      }
 
-      const service = new AutocompleteService();
-      sessionToken.current = new AutocompleteSessionToken();
-
-      service.getPlacePredictions({
+      const { suggestions } = await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
         input: businessName,
-        types: ['establishment'],
-        componentRestrictions: { country: 'np' },
+        includedPrimaryTypes: ['establishment'],
+        region: 'NP',
         sessionToken: sessionToken.current
-      }, (predictions: any) => {
-        if (predictions) {
-          const filteredResults = predictions
-            .filter((p: any) =>
-              p.types?.some((t: string) => ALLOWED_GOOGLE_BUSINESS_TYPES.includes(t))
-            )
-            .map((p: any) => ({
-              placeId: p.place_id,
-              mainText: { text: p.structured_formatting.main_text },
-              secondaryText: { text: p.structured_formatting.secondary_text },
-              types: p.types
-            }))
-            .slice(0, 5);
-          setPlaceSuggestions(filteredResults);
-        }
       });
+
+      if (suggestions) {
+        const filteredResults = suggestions
+          .map((s: any) => s.placePrediction)
+          .filter((p: any) =>
+            p.types?.some((t: string) => ALLOWED_GOOGLE_BUSINESS_TYPES.includes(t))
+          )
+          .map((p: any) => ({
+            placeId: p.placeId,
+            mainText: { text: p.mainText.text },
+            secondaryText: { text: p.secondaryText.text },
+            types: p.types
+          }))
+          .slice(0, 3);
+        setPlaceSuggestions(filteredResults);
+      }
     } catch (error) {
       console.error('Error fetching place suggestions:', error);
     }
@@ -111,6 +112,7 @@ export const BusinessInfoTab = ({
 
   useEffect(() => {
     if (forceSearchName && isLoaded) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchPlaceSuggestions(forceSearchName);
     }
   }, [forceSearchName, isLoaded]);
@@ -129,30 +131,35 @@ export const BusinessInfoTab = ({
     const fetchPredictions = async () => {
       if (debouncedSearchTerm && debouncedSearchTerm.length >= 2 && showDropdown && isLoaded && window.google) {
         try {
-          const { AutocompleteService } = await window.google.maps.importLibrary("places") as any;
-          const service = new AutocompleteService();
-          service.getPlacePredictions({
+          if (!sessionToken.current) {
+            const { AutocompleteSessionToken } = await window.google.maps.importLibrary("places") as any;
+            sessionToken.current = new AutocompleteSessionToken();
+          }
+
+          const { AutocompleteSuggestion } = await window.google.maps.importLibrary("places") as any;
+          const { suggestions } = await AutocompleteSuggestion.fetchAutocompleteSuggestions({
             input: debouncedSearchTerm,
-            types: ['establishment'],
+            includedPrimaryTypes: ['establishment'],
             componentRestrictions: { country: 'np' },
             sessionToken: sessionToken.current
-          }, (predictions: any) => {
-            if (predictions) {
-              const filteredResults = predictions
-                .filter((p: any) =>
-                  p.types?.some((t: string) => ALLOWED_GOOGLE_BUSINESS_TYPES.includes(t))
-                )
-                .map((p: any) => ({
-                  placeId: p.place_id,
-                  mainText: { text: p.structured_formatting.main_text },
-                  secondaryText: { text: p.structured_formatting.secondary_text },
-                  types: p.types
-                }));
-              setPredictions(filteredResults);
-            } else {
-              setPredictions([]);
-            }
           });
+
+          if (suggestions) {
+            const results = suggestions.map((s: any) => s.placePrediction);
+            const filteredResults = results
+              .filter((p: any) =>
+                p.types?.some((t: string) => ALLOWED_GOOGLE_BUSINESS_TYPES.includes(t))
+              )
+              .map((p: any) => ({
+                placeId: p.placeId,
+                mainText: { text: p.mainText.text },
+                secondaryText: { text: p.secondaryText.text },
+                types: p.types
+              }));
+            setPredictions(filteredResults);
+          } else {
+            setPredictions([]);
+          }
         } catch (error) {
           console.error('Error fetching predictions:', error);
           setPredictions([]);
@@ -162,7 +169,7 @@ export const BusinessInfoTab = ({
       }
     };
     fetchPredictions();
-  }, [debouncedSearchTerm, showDropdown, isLoaded]);
+  }, [debouncedSearchTerm, showDropdown, isLoaded, window.google]);
 
   const handleInputChange = (value: string) => {
     setInputValue(value);

@@ -160,7 +160,7 @@ export default function LoginScreen() {
             if (!redirect_uri) {
               toast.success('Registration completed successfully!');
             } else {
-              toast.info('Redirecting to external application...', { autoClose: 2000 });
+              toast.info('Redirecting to external application...');
             }
             completeAuth(data.data.user, data.data.access_token, keepSignedIn);
           },
@@ -186,7 +186,7 @@ export default function LoginScreen() {
         console.log('Login success:', response);
         completeAuth(response.data.user, response.data.access_token, keepSignedIn);
         if (redirect_uri) {
-          toast.info('Redirecting to external application...', { autoClose: 2000 });
+          toast.info('Redirecting to external application...');
         }
       } catch (error: any) {
         console.log('Login error in component:', error);

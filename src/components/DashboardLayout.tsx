@@ -44,9 +44,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             if (ssoToken) {
                 toast.dismiss(loadingToast);
                 // Open in new tab
-                console.log(`${process.env.EXPO_PUBLIC_MARKET_URL}/sso?jwt=${ssoToken}`);
+                console.log(`${process.env.NEXT_PUBLIC_MARKET_URL}/sso?jwt=${ssoToken}`);
                 
-                window.open(`${process.env.EXPO_PUBLIC_MARKET_URL}/sso?jwt=${ssoToken}`, '_blank');
+                window.open(`${process.env.NEXT_PUBLIC_MARKET_URL}/sso?jwt=${ssoToken}`, '_blank');
             } else {
                 toast.error('Failed to get SSO token', { id: loadingToast });
             }
@@ -337,7 +337,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </header>
 
                     {/* Page Content */}
-                    <main className="flex-1 overflow-y-auto p-6 relative ">
+                    <main className="flex-1 overflow-y-auto p-6 relative flex flex-col ">
                         {children}
 
                         <OutletModal
@@ -354,7 +354,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         />
 
                         {/* Footer */}
-                        <footer className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-gray-200 pt-12 pb-8">
+                        <div className='h-8'>
+
+                        </div>
+                        <footer className="mt-auto bottom-0 grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-gray-200 pt-8 pb-8">
                             <div>
                                 <h4 className="font-semibold text-lg mb-4">Company</h4>
                                 <p className="text-xs text-gray-500 mb-1">Redtab Private Limited</p>

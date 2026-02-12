@@ -126,7 +126,7 @@ export default function TeamManagementScreen() {
 
     return (
         <DashboardLayout>
-            <div className="max-w-4xl mx-auto px-4 sm:px-0">
+            <div className="max-w-4xl w-full mx-auto px-4 sm:px-0">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
                     <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Members</h1>
                     <button

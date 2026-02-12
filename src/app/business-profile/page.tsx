@@ -27,6 +27,8 @@ import {
     ConsentTab,
     DocPreview
 } from '@/components/kyc/index';
+import { useJsApiLoader } from '@react-google-maps/api';
+import { LIBRARIES } from '../kyc/page';
 
 
 export default function BusinessProfileScreen() {
@@ -45,6 +47,13 @@ export default function BusinessProfileScreen() {
     const showOutletField = !outlets || outlets.length === 0;
 
     const updateProfile = useUpdateBusinessProfileMutation();
+
+    const { isLoaded } = useJsApiLoader({
+        id: 'google-map-script',
+        googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+        libraries: LIBRARIES,
+        region: 'NP'
+    });
 
     const [kycData, setKycData] = useState({
         businessInformation: {
@@ -314,7 +323,7 @@ export default function BusinessProfileScreen() {
             const match = field.match(/\[(\d+)\]/);
             if (match) targetIndex = parseInt(match[1]);
         }
-        let updatedOwnerInfoArray = [...kycData.ownerPrimaryController];
+        const updatedOwnerInfoArray = [...kycData.ownerPrimaryController];
         let updatedOwnerInfo = { ...updatedOwnerInfoArray[targetIndex] };
 
         const primaryS3Key = s3Keys[0];
@@ -903,6 +912,7 @@ export default function BusinessProfileScreen() {
                         <div className="bg-white rounded-[32px] border border-gray-100 p-8 mt-2 shadow-sm flex-1 w-full">
                             {activeTab === 'Business Info' && (
                                 <BusinessInfoTab
+                                    isLoaded={isLoaded}
                                     kycData={kycData}
                                     handleKYCInputChange={handleKYCInputChange}
                                     handleFileUpload={handleFileUpload}
@@ -1058,8 +1068,8 @@ export default function BusinessProfileScreen() {
     return (
         <DashboardLayout>
             <div className="">
-                <div className="mb-0">
-                    <div className="flex items-center gap-4 mb-2 mt-4 ">
+                <div className="mb-0 flex flex-col items-center">
+                    <div className="max-w-4xl w-full flex items-center gap-4 mb-2 mt-4 ">
                         <h1 className="text-2xl font-semibold text-gray-900">Business Profile</h1>
                         <div className={`px-4 py-1.5 rounded-full flex items-center justify-center gap-2 border shadow-sm ${merchant?.kycStatus === 'done'
                             ? 'bg-green-50 border-green-100 text-green-700'
@@ -1080,7 +1090,7 @@ export default function BusinessProfileScreen() {
                         </button>
 
                     </div>
-                    <p className="text-sm text-gray-500 lg:max-w-[600px] leading-relaxed">
+                    <p className="max-w-4xl w-full text-sm text-gray-500 leading-relaxed">
                         {merchant?.kycStatus === 'done'
                             ? 'Your business profile is fully verified. You have full access to platform features, settlement tools, and credit facilities.'
                             : 'Your business verification is currently pending review. Redtab will verify your details and documents shortly to unlock full platform features and higher credit limits.'}
