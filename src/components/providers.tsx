@@ -6,14 +6,17 @@ import { ReactNode } from 'react'
 import { queryClient } from '@/lib/query-client'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { Toaster } from 'sonner'
+import { Suspense } from 'react'
 
 export default function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        {children}
-        <Toaster position="top-right" richColors closeButton />
-      </AuthProvider>
+      <Suspense fallback={null}>
+        <AuthProvider>
+          {children}
+          <Toaster position="top-right" richColors closeButton />
+        </AuthProvider>
+      </Suspense>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   )
